@@ -34,7 +34,7 @@ class MavenDirAccess
 		if not _entries.include?('repository')
 			raise 'Not a Maven repository'
 		end
-		@rootpath = File::join( path, 'repository')
+		@rootpath = File.join( path, 'repository')
 		@log = Logger.new(STDERR)
 		@log.level = Logger::INFO
 
@@ -49,7 +49,7 @@ class MavenDirAccess
 		artefacts = Array.new
 		top_groups.each do |g|
 			@log.info("--- top #{g}")
-			if File::directory?(File::join(@rootpath,g))
+			if File.directory?(File.join(@rootpath,g))
 				artefacts.concat( _traverse_dir(g) ) 
 			end
 		end
@@ -61,9 +61,9 @@ class MavenDirAccess
 	def _traverse_dir(sub)
 		@log.info("traversing into #{sub}")
 		artefacts = Array.new
-		path = File::join(@rootpath, sub)
-		Dir::chdir(path)
-		pom = Dir::glob('*.pom')
+		path = File.join(@rootpath, sub)
+		Dir.chdir(path)
+		pom = Dir.glob('*.pom')
 		if (pom.size > 0)	# found POM, add to found 
 			art = _path2art(sub)
 			@log.info("found artefact directory #{sub} -> artefact #{art}")
@@ -73,8 +73,8 @@ class MavenDirAccess
 		subs = Dir.entries(path) - [".", ".."]
 		subs.each do |s|
 			@log.info("dir entry #{s}")
-			next if not File::directory?(File.join(path,s))
-			ssub = File::join(sub, s)
+			next if not File.directory?(File.join(path,s))
+			ssub = File.join(sub, s)
 			arts = _traverse_dir(ssub)
 			artefacts |= arts
 		end
