@@ -32,15 +32,18 @@ class MainClass
 		if not File::exists?(@dirname)
 			raise "Directory #{dirname} does not exist"
 		end
-		@mvn = MavenDirAccess.new(@dirname)
+		@mvn = MavenDirAccess.new()
 	end
 	
-	def _tmp
+	def main
 		puts "initialized with directory: #{@dirname}"
-		puts "mvn repo: #{@mvn.get_artefacts}"
+		puts "running maven scan..."
+		@mvn.scan_dir(@dirname)
+		puts "... and the result is:\n#{@mvn.get_artefacts}"
 	end
 	
 end
 
-prog = MainClass.new('/home/brada/.m2/')
-prog._tmp
+#prog = MainClass.new('/home/brada/.m2/')
+prog = MainClass.new('/home/brada/pokusy/ruby/pom-dependencies-discovery/test-data/')
+prog.main

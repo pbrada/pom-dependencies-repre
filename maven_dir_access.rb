@@ -29,17 +29,43 @@ class MavenDirAccess
 	@entries
 	@log
 	
-	def initialize(path)
-		_entries = Dir.entries(path)
-		if not _entries.include?('repository')
-			raise 'Not a Maven repository'
-		end
-		@rootpath = File.join( path, 'repository')
+	# Create new instance with empty list of maven artefacts.
+	def initialize()
 		@log = Logger.new(STDERR)
 		@log.level = Logger::INFO
-
-		@entries = _scan_dir_for_artefact_names
+		
+		@entries = Array.new
 	end
+	
+	# Scans the given path for maven artefacts.
+	# Params:
+	# * String path	= filesystem path that should be a maven repository root
+	# * bool clean	= true: cleanup any previous artefacts found, false: add to previously found
+	def scan_dir(path, clean=true)
+		
+		if not Dir.entries(path).include?('repository')
+			raise 'Not a Maven repository'
+		end
+		@rootpath = File.join(path, 'repository')
+
+		@entries = Array.new if clean
+		@entries.concat(_scan_dir_for_artefact_names())
+	end
+	
+	# Returns a list of artefact names available in the repo.
+	def get_artefacts
+		return @entries
+	end
+	
+	# Returns the File of the _artefact_'s POM. Params:
+	# * String artefact = artefact name
+	def get_artefact_pom(artefact)
+		@log.warn("STUB")
+		return nil
+	end
+
+	# ----- 
+	private
 	
 	# creates and returns a basic list of artefacts available in the repo
 	def _scan_dir_for_artefact_names
@@ -102,16 +128,6 @@ class MavenDirAccess
 	def _path2ver(path)
 		@log.warn("STUB")
 		return ""
-	end
-	
-	def get_artefacts
-	# returns a list of artefact names available in the repo
-		return @entries
-	end
-	
-	def get_artefact_pom
-		# returns the File of the artefact's POM
-		return nil
 	end
 	
 end
