@@ -20,6 +20,7 @@
 #  
 
 require 'logger'
+require 'artefact'
 
 # Traverses a Maven repository directory tree and stores the data
 # about artefacts available in the repository.
@@ -92,8 +93,13 @@ class MavenDirAccess
 		pom = Dir.glob('*.pom')
 		if (pom.size > 0)	# found POM, add to found 
 			art = _path2art(sub)
-			@log.info("found artefact directory #{sub} -> artefact #{art}")
-			artefacts.push(art)
+			a = Artefact.new
+			a.aid = art
+			a.path = sub
+			a.root = @rootpath
+			@log.info("found artefact directory #{sub} -> artefact #{a}")
+			#artefacts.push(art)
+			artefacts.push(a)
 		end
 		# recurse into subdirs, if any
 		subs = Dir.entries(path) - [".", ".."]
@@ -115,7 +121,6 @@ class MavenDirAccess
 	# cz.zcu.kiv.crce.crce-reactor
 	def _path2art(path)
 		artpath = path.sub(/\/[^\/]+\/?$/,"")	# remove last path component
-		#artpath.sub!(/\/$/,"")  # remove trailing slash
 		artpath.tr!('/','.')	# turn into gid-artefactid
 		return artpath
 	end
