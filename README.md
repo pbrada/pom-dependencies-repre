@@ -1,6 +1,13 @@
 
-POM dependencies discovery tool
+POM dependencies discovery and representation creating tool
 ===============================
+
+Status
+------
+
+Under development, information below serves as a sketch specification
+(not as tool description).
+
 
 Usage
 -----
