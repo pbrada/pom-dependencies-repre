@@ -19,9 +19,7 @@
 #  
 #  
 
-$LOAD_PATH << '.'
-
-require 'maven_dir_access'
+require_relative 'maven_dir_access'
 
 class MainClass
 
@@ -35,15 +33,15 @@ class MainClass
 		@mvn = MavenDirAccess.new()
 	end
 	
-	def main
+	def run
 		puts "initialized with directory: #{@dirname}"
 		puts "running maven scan..."
 		@mvn.scan_dir(@dirname)
-		puts "... and the result is:\n#{@mvn.get_artefacts}"
+		puts "... and the result is:"
+		@mvn.get_artefacts().each do |a|
+			puts a.get_coordinates
+			#puts "#{a}\n   (#{a.inspect})"
+		end
 	end
 	
 end
-
-#prog = MainClass.new('/home/brada/.m2/')
-prog = MainClass.new('/home/brada/pokusy/ruby/pom-dependencies-discovery/test-data/')
-prog.main

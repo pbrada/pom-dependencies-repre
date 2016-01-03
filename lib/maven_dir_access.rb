@@ -20,7 +20,9 @@
 #  
 
 require 'logger'
-require 'artefact'
+
+require_relative 'artefact'
+
 
 # Traverses a Maven repository directory tree and stores the data
 # about artefacts available in the repository.
@@ -33,7 +35,8 @@ class MavenDirAccess
 	# Create new instance with empty list of maven artefacts.
 	def initialize()
 		@log = Logger.new(STDERR)
-		@log.level = Logger::INFO
+		@log.level = Logger::DEBUG
+		@reclevel = 0
 		
 		@entries = Array.new
 	end
@@ -60,9 +63,10 @@ class MavenDirAccess
 	
 	# Returns the File of the _artefact_'s POM. Params:
 	# * String artefact = artefact name
-	def get_artefact_pom(artefact)
-		@log.warn("STUB")
-		return nil
+	def get_pom_file(artefact)
+		p = artefact.pom[0]  # if more POMs exist, take the first one
+		f = File.new(File.join(artefact.root, artefact.path, p))
+		return f
 	end
 
 	# ----- 
@@ -80,59 +84,38 @@ class MavenDirAccess
 				artefacts.concat( _traverse_dir(g) ) 
 			end
 		end
+		artefacts.sort!
 		return artefacts
 	end
 	
 	# starting from 'top' directory, recurse into its subdirs and look for those
 	# which contain a *.pom file - add those to a list of artefact
 	def _traverse_dir(sub)
-		@log.info("traversing into #{sub}")
+		@reclevel += 1
+		@log.debug("traversing into #{sub} (recursion level #{@reclevel})")
 		artefacts = Array.new
 		path = File.join(@rootpath, sub)
 		Dir.chdir(path)
 		pom = Dir.glob('*.pom')
 		if (pom.size > 0)	# found POM, add to found 
-			art = _path2art(sub)
-			a = Artefact.new
-			a.aid = art
-			a.path = sub
-			a.root = @rootpath
+			a = Artefact.new(sub, @rootpath, pom)
 			@log.info("found artefact directory #{sub} -> artefact #{a}")
-			#artefacts.push(art)
 			artefacts.push(a)
 		end
-		# recurse into subdirs, if any
+		# investigate path content
 		subs = Dir.entries(path) - [".", ".."]
 		subs.each do |s|
-			@log.info("dir entry #{s}")
+			@log.debug("dir entry #{s}")
 			next if not File.directory?(File.join(path,s))
 			ssub = File.join(sub, s)
+			# recurse into each subdir
 			arts = _traverse_dir(ssub)
+			# and accumulate artefacts found within
 			artefacts |= arts
 		end
-		@log.info("leaving #{sub} with #{artefacts.size} new artefacts")
+		@reclevel -= 1
+		@log.debug("leaving #{sub} with #{artefacts.size} new artefacts")
 		return artefacts
-	end
-	
-	# takes a subpath of maven repo - which is assumed to be a directory
-	# holding a POM file - and from the path string creates artefact string
-	#
-	# Example: cz/zcu/kiv/crce/crce-reactor/2.1.0-SNAPSHOT/ -> 
-	# cz.zcu.kiv.crce.crce-reactor
-	def _path2art(path)
-		artpath = path.sub(/\/[^\/]+\/?$/,"")	# remove last path component
-		artpath.tr!('/','.')	# turn into gid-artefactid
-		return artpath
-	end
-	
-	# takes a subpath of maven repo - which is assumed to be a directory
-	# holding a POM file - and from the path string creates artefact version
-	#
-	# Example: cz/zcu/kiv/crce/crce-reactor/2.1.0-SNAPSHOT/ -> 
-	# 2.1.0-SNAPSHOT
-	def _path2ver(path)
-		@log.warn("STUB")
-		return ""
 	end
 	
 end
