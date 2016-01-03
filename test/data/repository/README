@@ -16,7 +16,10 @@ Standard:
 
 Border cases:
 
-* de -- just POM (no JAR artefact) + non-standard part of artefact id
+* cz -- single version but 2 content-identical POM files inside the directory
+  (event-log-provider-1.0.0-SNAPSHOT.pom , 
+   event-log-provider-1.0.0-20131125.115635-4.pom)
+* de -- just POM (no JAR artefact) + non-standard artefact id string
   (de/twentyeleven/skysail/skysail.build.maven.parentPom/0.8.2/)
 
 Exceptions:
