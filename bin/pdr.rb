@@ -21,5 +21,5 @@
 
 require 'main'
 
-prog = MainClass.new('../test/data/')
+prog = MainClass.new('./test/data/')
 prog.run

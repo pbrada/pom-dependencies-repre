@@ -47,6 +47,7 @@ class MavenDirAccess
 	# * bool clean	= true: cleanup any previous artefacts found, false: add to previously found
 	def scan_dir(path, clean=true)
 		
+		path = File.expand_path(path)
 		if not Dir.entries(path).include?('repository')
 			raise 'Not a Maven repository'
 		end
