@@ -1,0 +1,76 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>cz.zcu.kiv.guica</groupId>
+		<artifactId>pom-parent</artifactId>
+		<version>1.2-SNAPSHOT</version>
+		<relativePath>../pom/pom.xml</relativePath>
+	</parent>
+
+	<artifactId>event-log-provider</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+
+	<packaging>bundle</packaging>
+	<name>GUICA Event log provider</name>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<osgi.bundle.version>1.0.0</osgi.bundle.version>
+	</properties>
+
+	<build>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.3.7</version>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Export-Package>cz.zcu.kiv.guica.eventlog.provider</Export-Package>
+						<Private-Package>cz.zcu.kiv.guica.eventlog.provider.impl,cz.zcu.kiv.guica.eventlog.provider.activator</Private-Package>
+						<Import-Package>*</Import-Package>
+						<Bundle-Activator>cz.zcu.kiv.guica.eventlog.provider.activator.Activator</Bundle-Activator>
+						<Bundle-Name>${project.name} (${project.version})</Bundle-Name>
+						<Bundle-Version>${osgi.bundle.version}</Bundle-Version>
+						<Bundle-ProductVersion>${project.version}</Bundle-ProductVersion>
+						<Bundle-Vendor>${project.organization.name}</Bundle-Vendor>
+						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+						<Include-Resource>src/main/resources</Include-Resource>
+					</instructions>
+				</configuration>
+			</plugin>
+
+		</plugins>
+
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>cz.zcu.kiv.guica</groupId>
+			<artifactId>support</artifactId>
+			<version>1.3.0-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<version>4.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.compendium</artifactId>
+			<version>4.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.eventadmin</artifactId>
+			<version>1.2.14</version>
+		</dependency>
+
+	</dependencies>
+
+</project>

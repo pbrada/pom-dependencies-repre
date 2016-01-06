@@ -1,4 +1,4 @@
-#  main.rb
+#  pdr.rb -- driver script for "POM Dependency Representation" tool
 #  
 #  Copyright 2015 Premek Brada <brada@xubuntu1504vbox>
 #  
@@ -19,31 +19,7 @@
 #  
 #  
 
-$LOAD_PATH << '.'
+require 'main'
 
-require 'maven_dir_access'
-
-class MainClass
-
-	@mvn	# maven repo accessor
-	
-	def initialize(dirname)
-		@dirname = dirname
-		if not File::exists?(@dirname)
-			raise "Directory #{dirname} does not exist"
-		end
-		@mvn = MavenDirAccess.new()
-	end
-	
-	def main
-		puts "initialized with directory: #{@dirname}"
-		puts "running maven scan..."
-		@mvn.scan_dir(@dirname)
-		puts "... and the result is:\n#{@mvn.get_artefacts}"
-	end
-	
-end
-
-#prog = MainClass.new('/home/brada/.m2/')
-prog = MainClass.new('./test-data/')
-prog.main
+prog = MainClass.new('../test/data/')
+prog.run

@@ -12,7 +12,7 @@ Under development, information below serves as a sketch specification
 Usage
 -----
 
-toolname <directory> [filename]
+bin/pdr <directory> [filename]
 
 
 Description

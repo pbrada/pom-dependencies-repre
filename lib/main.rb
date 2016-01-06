@@ -1,4 +1,4 @@
-#  artefact.rb
+#  main.rb
 #  
 #  Copyright 2015 Premek Brada <brada@xubuntu1504vbox>
 #  
@@ -19,29 +19,29 @@
 #  
 #  
 
+require_relative 'maven_dir_access'
 
-# Represents an Maven artefact, via its gid+aid+version, together
-# with the repository where it is stored.
-class Artefact
+class MainClass
 
-	attr_accessor	:gid, :aid, :vers, :path, :root
+	@mvn	# maven repo accessor
 	
-	@gid
-	@aid
-	@vers
-	# path within repository where the artefact is found
-	@path
-	# path of repository root directory
-	@root
-	
-	def initialize
-		
+	def initialize(dirname)
+		@dirname = dirname
+		if not File::exists?(@dirname)
+			raise "Directory #{dirname} does not exist"
+		end
+		@mvn = MavenDirAccess.new()
 	end
 	
-	def to_s
-		return "#{gid}:#{aid}:#{vers}@#{@root}"
+	def run
+		puts "initialized with directory: #{@dirname}"
+		puts "running maven scan..."
+		@mvn.scan_dir(@dirname)
+		puts "... and the result is:"
+		@mvn.get_artefacts().each do |a|
+			puts a.get_coordinates
+			#puts "#{a}\n   (#{a.inspect})"
+		end
 	end
 	
 end
-
-
