@@ -45,5 +45,5 @@ class MainClass
 end
 
 #prog = MainClass.new('/home/brada/.m2/')
-prog = MainClass.new('/home/brada/pokusy/ruby/pom-dependencies-discovery/test-data/')
+prog = MainClass.new('./test-data/')
 prog.main
