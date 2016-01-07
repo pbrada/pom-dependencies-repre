@@ -35,7 +35,7 @@ class MavenDirAccess
 	# Create new instance with empty list of maven artefacts.
 	def initialize()
 		@log = Logger.new(STDERR)
-		@log.level = Logger::DEBUG
+		@log.level = Logger::INFO
 		@reclevel = 0
 		
 		@entries = Array.new
@@ -67,6 +67,7 @@ class MavenDirAccess
 	def get_pom_file(artefact)
 		p = artefact.pom[0]  # if more POMs exist, take the first one
 		f = File.new(File.join(artefact.root, artefact.path, p))
+		@log.debug "returning #{f} as POM file from path #{p}"
 		return f
 	end
 

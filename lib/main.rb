@@ -20,6 +20,7 @@
 #  
 
 require_relative 'maven_dir_access'
+require_relative 'pom_analyzer'
 
 class MainClass
 
@@ -38,9 +39,15 @@ class MainClass
 		puts "running maven scan..."
 		@mvn.scan_dir(@dirname)
 		puts "... and the result is:"
+		pa = PomAnalyzer.new
 		@mvn.get_artefacts().each do |a|
-			puts a.get_coordinates
 			#puts "#{a}\n   (#{a.inspect})"
+			fa = @mvn.get_pom_file a
+			pa.init_from_file fa
+			puts "artefact: #{a.get_coordinates} / #{pa.get_artefact_coords}"
+			puts "dependencies:"
+			pa.get_dependencies.each { |d| puts d }
+			puts "---"
 		end
 	end
 	

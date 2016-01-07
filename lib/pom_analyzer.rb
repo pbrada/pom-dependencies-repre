@@ -19,7 +19,7 @@
 #  
 #  
 
-
+require 'logger'
 require "rexml/document"
 
 # Analyzes the contents of POM file, to extract information on the 
@@ -27,52 +27,74 @@ require "rexml/document"
 class PomAnalyzer
 
 	# the document representation
-	@pom
+	@pom = nil
 	
 	# Constructor, takes a File reference to the POM file.
-	def initialize(pomfile)
-		@pom = REXML::Document.new pomfile
+	def initialize
+		@log = Logger.new(STDERR)
+		@log.level = Logger::ERROR
 	end
 	
+	# Initializes the XML document from given POM file reference.
+	def init_from_file(file)
+		@pom = REXML::Document.new file
+	rescue
+		@log.error "could not read #{file} as XML"
+		@pom = nil
+		raise
+	end
+	
+	# Initializes the XML document from POM provided in a string.
 	def init_from_string(string)
 		@pom = REXML::Document.new string
+	rescue
+		@log.error "could not read provided string as XML"
+		@pom = nil
 	end
 	
+	# Returns the artefact coordinates obtained from POM XML.
 	def get_artefact_coords
 		root = @pom.root
 		res = Hash.new
-		res["gid"] = root.elements["groupId"].text
 		res["aid"] = root.elements["artifactId"].text
 		res["vers"] = root.elements["version"].text
+		res["gid"] = root.elements["groupId"].text
+	rescue
+		@log.warn "problem in parsing POM for artefact coordinates"
+	ensure
 		return res
 	end
 	
+	# Returns a hash with data (coordinates, scope) of a dependency 
+	# for which the XML subtree is provided as 'elem'.  Returns 'nil'
+	# if data could not be parsed as a dependency.
 	def get_dependency(elem)
 		res = Hash.new
 		res["gid"] = elem.elements["groupId"].text
 		res["aid"] = elem.elements["artifactId"].text
 		res["vers"] = elem.elements["version"].text
 		res["scope"] = elem.elements["scope"].text
-		return res
 	rescue	# most probably a XML parsing error due to missing elements
 		if (res["gid"] == nil) or (res["aid"] == nil)
 			# missing required parts of dependency declaration, bail out
 			res = nil
-			raise "missing required elements in a dependency declaration"
-		else	# only optional parts missing, bear with that
-			return res
-		end
+			@log.warn "missing required elements in a dependency declaration"
+		end	# only optional parts missing, bear with that
+	ensure
+		return res
 	end
 	
+	# Returns a list (array) of dependencies read from the POM data
+	# given to a init_from_* method.
 	def get_dependencies
 		root = @pom.root
 		deps = Array.new
 		root.elements.each("dependencies/dependency") do |d|
-			puts "(analyzing dep decl #{d})"
+			@log.debug "analyzing dep decl #{d}"
 			begin
 				dep = get_dependency d
 			rescue	# is here to catch RuntimeError due to bad 'd' syntax
-				puts "(syntax error in dependency decl: #{d})"
+				@log.warn "syntax error in dependency decl: #{d}"
 			else 
 				deps.push dep
 			end
@@ -132,10 +154,16 @@ xmlstring = <<EOF
 </project>
 EOF
 
-pa = PomAnalyzer.new nil
-pa.init_from_string xmlstring
-puts "artefact:"
-puts pa.get_artefact_coords
-puts "dependencies:"
-pa.get_dependencies.each { |d| puts d }
-puts "---"
+#pa = PomAnalyzer.new 
+#pa.init_from_string xmlstring
+#
+##xmlfilename = "/home/brada/dev/pom-dependencies-repre/test/data/repository/cz/zcu/kiv/guica/event-log-provider/1.0.0-SNAPSHOT/event-log-provider-1.0.0-SNAPSHOT.pom"
+##xmlfile = File.open xmlfilename
+##pa = PomAnalyzer.new xmlfile
+#
+#puts "artefact:"
+#puts pa.get_artefact_coords
+#puts "dependencies:"
+#pa.get_dependencies.each { |d| puts d }
+#puts "---"
+
