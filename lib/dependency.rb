@@ -25,11 +25,16 @@ class Dependency
 
 	attr_reader :gid, :aid, :vers, :scope
 	
-	def initialize(gid,aid,vers="",scope="")
-		@gid = gid
-		@aid = aid
-		@vers = vers
-		@scope = scope
+	# Create from a hash with coordinates.
+	def initialize(data)
+		@gid = data["gid"]
+		@aid = data["aid"]
+		@vers = data["vers"]	# optional
+		@scope = data["scope"]	# optional
+	end
+	
+	def to_s
+		return "#{gid}:#{aid}:#{vers} (#{scope})"
 	end
 end
 

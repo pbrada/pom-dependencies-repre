@@ -22,6 +22,10 @@
 require_relative 'maven_dir_access'
 require_relative 'pom_analyzer'
 
+require 'logger'
+
+$LOGLEVEL = Logger::ERROR
+
 class MainClass
 
 	@mvn	# maven repo accessor

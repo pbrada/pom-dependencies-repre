@@ -22,8 +22,13 @@
 require 'logger'
 require "rexml/document"
 
+require_relative 'dependency'
+
 # Analyzes the contents of POM file, to extract information on the 
-# artefact and its dependencies.
+# artefact and its dependencies.  
+# 
+# A "DAO" class that returns domain objects (Artefact, Dependency).
+# 
 class PomAnalyzer
 
 	# the document representation
@@ -32,7 +37,7 @@ class PomAnalyzer
 	# Constructor, takes a File reference to the POM file.
 	def initialize
 		@log = Logger.new(STDERR)
-		@log.level = Logger::ERROR
+		@log.level = $LOGLEVEL
 	end
 	
 	# Initializes the XML document from given POM file reference.
@@ -65,10 +70,34 @@ class PomAnalyzer
 		return res
 	end
 	
+	# Returns a list (array) of Dependencies read from the POM data
+	# given to a 'init_from_*' method.
+	def get_dependencies
+		root = @pom.root
+		deps = Array.new
+		root.elements.each("dependencies/dependency") do |d|
+			@log.debug "analyzing dep decl #{d}"
+			begin
+				depd = get_dependency_data d
+				@log.debug "got dependency data #{depd}"
+				dep = Dependency.new depd
+				@log.debug "... and Dependency #{dep}"
+			rescue	# is here to catch RuntimeError due to bad 'd' syntax
+				@log.warn "syntax error in dependency decl: #{d}"
+			else 
+				deps.push dep
+			end
+		end
+		return deps
+	end
+
+	# -----
+	private
+	
 	# Returns a hash with data (coordinates, scope) of a dependency 
 	# for which the XML subtree is provided as 'elem'.  Returns 'nil'
 	# if data could not be parsed as a dependency.
-	def get_dependency(elem)
+	def get_dependency_data(elem)
 		res = Hash.new
 		res["gid"] = elem.elements["groupId"].text
 		res["aid"] = elem.elements["artifactId"].text
@@ -82,24 +111,6 @@ class PomAnalyzer
 		end	# only optional parts missing, bear with that
 	ensure
 		return res
-	end
-	
-	# Returns a list (array) of dependencies read from the POM data
-	# given to a init_from_* method.
-	def get_dependencies
-		root = @pom.root
-		deps = Array.new
-		root.elements.each("dependencies/dependency") do |d|
-			@log.debug "analyzing dep decl #{d}"
-			begin
-				dep = get_dependency d
-			rescue	# is here to catch RuntimeError due to bad 'd' syntax
-				@log.warn "syntax error in dependency decl: #{d}"
-			else 
-				deps.push dep
-			end
-		end
-		return deps
 	end
 	
 end

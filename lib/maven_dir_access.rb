@@ -26,7 +26,9 @@ require_relative 'artefact'
 
 # Traverses a Maven repository directory tree and stores the data
 # about artefacts available in the repository.
-
+# 
+# A "DAO" class that returns domain objects (Artefact, Dependency).
+# 
 class MavenDirAccess
 	@rootpath = ''
 	@entries
@@ -35,7 +37,7 @@ class MavenDirAccess
 	# Create new instance with empty list of maven artefacts.
 	def initialize()
 		@log = Logger.new(STDERR)
-		@log.level = Logger::INFO
+		@log.level = $LOGLEVEL
 		@reclevel = 0
 		
 		@entries = Array.new

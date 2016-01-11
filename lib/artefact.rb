@@ -50,6 +50,12 @@ class Artefact
 		@gid = elems[0...-2].join('.')
 	end
 	
+	# Given a hash with "gid","aid","vers" returns true if the hash
+	# represents the same artefact as this object; false otherwise.
+	def check(artdata)
+		res = ((@gid == artdata["gid"]) and (@aid == artdata["aid"]) and (@vers == artdata["vers"]))
+	end
+	
 	def get_coordinates
 		return "#{gid}:#{aid}:#{vers}"
 	end
