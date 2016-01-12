@@ -33,6 +33,10 @@ class Dependency
 		@scope = data["scope"]	# optional
 	end
 	
+	def get_coordinates
+		return "#{gid}:#{aid}:#{vers}"
+	end
+	
 	def to_s
 		return "#{gid}:#{aid}:#{vers} (#{scope})"
 	end

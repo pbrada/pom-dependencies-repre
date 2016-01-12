@@ -41,18 +41,28 @@ class MainClass
 	def run
 		puts "initialized with directory: #{@dirname}"
 		puts "running maven scan..."
-		@mvn.scan_dir(@dirname)
-		puts "... and the result is:"
-		pa = PomAnalyzer.new
-		@mvn.get_artefacts().each do |a|
+
+		# obtain data
+		@mvn.create_artefact_representation @dirname
+		#@mvn.scan_dir(@dirname)
+		#pa = PomAnalyzer.new
+		#@mvn.get_artefacts().each do |a|
 			#puts "#{a}\n   (#{a.inspect})"
-			fa = @mvn.get_pom_file a
-			pa.init_from_file fa
-			puts "artefact: #{a.get_coordinates} / #{pa.get_artefact_coords}"
-			puts "dependencies:"
-			pa.get_dependencies.each { |d| puts d }
-			puts "---"
+		#	fa = @mvn.get_pom_file a
+		#	pa.init_from_file fa
+		#	a.add_dependencies pa.get_dependencies
+			#puts "artefact: #{a.get_coordinates} / #{pa.get_artefact_coords} (#{a.check pa.get_artefact_coords}	)"
+			#puts "dependencies:"
+			#pa.get_dependencies.each { |d| puts d }
+			#puts "---"
+		#end
+		
+		puts "... and the result is:"
+		@mvn.get_artefacts().each do |a| 
+			#puts "#{a}\n   (#{a.inspect})"
+			puts a.get_representation("txt")
 		end
+
 	end
 	
 end

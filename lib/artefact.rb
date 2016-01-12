@@ -29,6 +29,10 @@ class Artefact
 	@gid
 	@aid
 	@vers
+	
+	# list of Dependency items
+	@dependencies
+	
 	# path within repository where the artefact is found
 	@path
 	# path of repository root directory
@@ -42,12 +46,28 @@ class Artefact
 		@root = root
 		@path = path
 		@pom = pom
+		# empty dependency list at the beginning
+		@dependencies = Array.new
 		# parse the path to get artefact coordinate elements
 		# e.g. -> ch.qos.logback , logback-core , 1.1.3
 		elems = path.split("/")		
 		@vers = elems[-1]
 		@aid = elems[-2]
 		@gid = elems[0...-2].join('.')
+	end
+	
+	# Adds a dependency
+	def add_dependency(dep)
+		@dependencies.push dep
+	end
+	
+	# Appends an array of Dependency items to the already stored ones.
+	def add_dependencies(deps)
+		@dependencies.concat deps
+	end
+	
+	def get_dependencies
+		return @dependencies
 	end
 	
 	# Given a hash with "gid","aid","vers" returns true if the hash
@@ -62,6 +82,33 @@ class Artefact
 	
 	def to_s
 		return "#{get_coordinates}@#{@root}"
+	end
+	
+	# Returns a string with this artefacts full representation 
+	# in the given format.
+	# _fmt_ can be one of "txt", "yml", "xml", "graphml"
+	def get_representation(fmt="txt", scope=false)
+		res = ""
+		
+		case fmt
+		when "yml" then
+			puts "not yet implemented"
+		when "xml" then
+			puts "not yet implemented"
+		when "graphml" then
+			puts "not yet implemented"
+		else	# return "txt" by default
+			res += get_coordinates + "\n"
+			@dependencies.each do |d|
+				if scope then
+					res += "\t#{d}\n"
+				else
+					res += "\t#{d.get_coordinates}\n"
+				end
+			end
+		end
+		
+		return res
 	end
 	
 	def <=>(other)

@@ -43,20 +43,21 @@ class MavenDirAccess
 		@entries = Array.new
 	end
 	
-	# Scans the given path for maven artefacts.
-	# Params:
-	# * String path	= filesystem path that should be a maven repository root
-	# * bool clean	= true: cleanup any previous artefacts found, false: add to previously found
-	def scan_dir(path, clean=true)
+	# Creates the representation of artefacts - and their dependencies -
+	# stored in the repository at _path_, adding to any already existing
+	# artefact representations unless _clean_ is set to 'true'.
+	def create_artefact_representation(path, clean=true)
+		# first get artefact list from directory structure
+		scan_dir path, clean
 		
-		path = File.expand_path(path)
-		if not Dir.entries(path).include?('repository')
-			raise 'Not a Maven repository'
+		# second, for each artefact get its dependencies
+		pa = PomAnalyzer.new
+		@entries.each do |a|
+			#puts "#{a}\n   (#{a.inspect})"
+			file_of_a = get_pom_file a
+			pa.init_from_file file_of_a
+			a.add_dependencies pa.get_dependencies
 		end
-		@rootpath = File.join(path, 'repository')
-
-		@entries = Array.new if clean
-		@entries.concat(_scan_dir_for_artefact_names())
 	end
 	
 	# Returns a list of artefact names available in the repo.
@@ -75,6 +76,22 @@ class MavenDirAccess
 
 	# ----- 
 	private
+	
+	# Scans the given path for maven artefacts.
+	# Params:
+	# * String path	= filesystem path that should be a maven repository root
+	# * bool clean	= true: cleanup any previous artefacts found, false: add to previously found
+	def scan_dir(path, clean=true)
+		
+		path = File.expand_path(path)
+		if not Dir.entries(path).include?('repository')
+			raise 'Not a Maven repository'
+		end
+		@rootpath = File.join(path, 'repository')
+
+		@entries = Array.new if clean
+		@entries.concat _scan_dir_for_artefact_names()
+	end
 	
 	# creates and returns a basic list of artefacts available in the repo
 	def _scan_dir_for_artefact_names
