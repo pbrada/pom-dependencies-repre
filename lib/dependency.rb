@@ -23,7 +23,8 @@
 # Represents the maven data about an artefact's dependency.
 class Dependency
 
-	attr_reader :gid, :aid, :vers, :scope
+	# dependency coordinates and scope
+	attr_reader :gid, :aid, :vers, :scope		# : String
 	
 	# Create from a hash with coordinates.
 	def initialize(data)

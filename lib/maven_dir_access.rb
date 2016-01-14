@@ -30,39 +30,37 @@ require_relative 'artefact'
 # A "DAO" class that returns domain objects (Artefact, Dependency).
 # 
 class MavenDirAccess
+
+	attr_reader		:artefacts		# : list of Artefact
+	
 	@rootpath = ''
-	@entries
-	@log
+	@log = nil 		# : Logger
 	
 	# Create new instance with empty list of maven artefacts.
 	def initialize()
 		@log = Logger.new(STDERR)
 		@log.level = $LOGLEVEL
-		@reclevel = 0
+		@reclevel = 0	# recursion level, just for interest
 		
-		@entries = Array.new
+		@artefacts = Array.new
 	end
 	
-	# Creates the representation of artefacts - and their dependencies -
-	# stored in the repository at _path_, adding to any already existing
+	# Creates the representation of artefacts and their dependencies
+	# stored in the repository at _path_. Adds to any already existing
 	# artefact representations unless _clean_ is set to 'true'.
 	def create_artefact_representation(path, clean=true)
-		# first get artefact list from directory structure
+	
+		# first, get artefact list from directory structure
 		scan_dir path, clean
 		
 		# second, for each artefact get its dependencies
 		pa = PomAnalyzer.new
-		@entries.each do |a|
+		@artefacts.each do |a|
 			#puts "#{a}\n   (#{a.inspect})"
 			file_of_a = get_pom_file a
 			pa.init_from_file file_of_a
 			a.add_dependencies pa.get_dependencies
 		end
-	end
-	
-	# Returns a list of artefact names available in the repo.
-	def get_artefacts
-		return @entries
 	end
 	
 	# Returns the File of the _artefact_'s POM. Params:
@@ -89,11 +87,11 @@ class MavenDirAccess
 		end
 		@rootpath = File.join(path, 'repository')
 
-		@entries = Array.new if clean
-		@entries.concat _scan_dir_for_artefact_names()
+		@artefacts = Array.new if clean
+		@artefacts.concat _scan_dir_for_artefact_names()
 	end
 	
-	# creates and returns a basic list of artefacts available in the repo
+	# Creates and returns a basic list of artefacts available in the repo.
 	def _scan_dir_for_artefact_names
 		top_groups = Dir.entries(@rootpath) - [".", ".."]
 		# recurse into each top group-id directories until *.pom files are discovered
@@ -109,18 +107,19 @@ class MavenDirAccess
 		return artefacts
 	end
 	
-	# starting from 'top' directory, recurse into its subdirs and look for those
-	# which contain a *.pom file - add those to a list of artefact
-	def _traverse_dir(sub)
+	# Starting from 'top' directory, recurse into its subdirs and look for those
+	# which contain a *.pom file - add those to a list of artefacts,
+	# and finally return this list.
+	def _traverse_dir(top)
 		@reclevel += 1
-		@log.debug("traversing into #{sub} (recursion level #{@reclevel})")
+		@log.debug("traversing into #{top} (recursion level #{@reclevel})")
 		artefacts = Array.new
-		path = File.join(@rootpath, sub)
+		path = File.join(@rootpath, top)
 		Dir.chdir(path)
 		pom = Dir.glob('*.pom')
 		if (pom.size > 0)	# found POM, add to found 
-			a = Artefact.new(sub, @rootpath, pom)
-			@log.info("found artefact directory #{sub} -> artefact #{a}")
+			a = Artefact.new(top, @rootpath, pom)
+			@log.info("found artefact directory #{top} -> artefact #{a}")
 			artefacts.push(a)
 		end
 		# investigate path content
@@ -128,14 +127,14 @@ class MavenDirAccess
 		subs.each do |s|
 			@log.debug("dir entry #{s}")
 			next if not File.directory?(File.join(path,s))
-			ssub = File.join(sub, s)
+			ssub = File.join(top, s)
 			# recurse into each subdir
 			arts = _traverse_dir(ssub)
 			# and accumulate artefacts found within
 			artefacts |= arts
 		end
 		@reclevel -= 1
-		@log.debug("leaving #{sub} with #{artefacts.size} new artefacts")
+		@log.debug("leaving #{top} with #{artefacts.size} new artefacts")
 		return artefacts
 	end
 	

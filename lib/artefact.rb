@@ -21,24 +21,19 @@
 
 
 # Represents an Maven artefact, via its gid+aid+version, together
-# with the repository where it is stored.
+# with the info on repository where it is stored.
 class Artefact
 
-	attr_accessor	:gid, :aid, :vers, :path, :root, :pom
-	
-	@gid
-	@aid
-	@vers
+	# artefact coordinates
+	attr_accessor	:gid, :aid, :vers		# : String
 	
 	# list of Dependency items
-	@dependencies
+	attr_accessor 	:dependencies			# : list of Dependency
 	
-	# path within repository where the artefact is found
-	@path
 	# path of repository root directory
-	@root
+	# path within repository where the artefact is found
 	# name(s) of POM file(s) for the artefact
-	@pom
+	attr_accessor	:path, :root, :pom		# : String
 	
 	# Instantiate by parsing a sub-path of maven repo
 	# (e.g. "ch/qos/logback/logback-core/1.1.3").
@@ -66,20 +61,19 @@ class Artefact
 		@dependencies.concat deps
 	end
 	
-	def get_dependencies
-		return @dependencies
-	end
-	
 	# Given a hash with "gid","aid","vers" returns true if the hash
 	# represents the same artefact as this object; false otherwise.
 	def check(artdata)
-		res = ((@gid == artdata["gid"]) and (@aid == artdata["aid"]) and (@vers == artdata["vers"]))
+		return ((@gid == artdata["gid"]) and (@aid == artdata["aid"]) and (@vers == artdata["vers"]))
 	end
 	
+	# Returns string with "gid:aid:vers" .
 	def get_coordinates
 		return "#{gid}:#{aid}:#{vers}"
 	end
 	
+	# Returns string with "gid:aid:vers@path" where _path_ is the root
+	# directory of maven repo where this artefact comes from.
 	def to_s
 		return "#{get_coordinates}@#{@root}"
 	end
@@ -87,6 +81,7 @@ class Artefact
 	# Returns a string with this artefacts full representation 
 	# in the given format.
 	# _fmt_ can be one of "txt", "yml", "xml", "graphml"
+	# _scope_ determines whether dependency scopes should be output
 	def get_representation(fmt="txt", scope=false)
 		res = ""
 		
@@ -111,6 +106,7 @@ class Artefact
 		return res
 	end
 	
+	# Comparison, for sorting a list of Artefacts by coordinates.
 	def <=>(other)
 		return self.get_coordinates <=> other.get_coordinates
 	end
