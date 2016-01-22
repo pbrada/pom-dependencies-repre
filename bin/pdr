@@ -2,10 +2,10 @@
 # POM Dependency Representation tool
 
 # expects to be run from parent directory, as 'bin/pdr'
-ruby -I ./lib ./bin/pdr.rb 
+ruby -I ./lib ./bin/pdr.rb $1
 
 #  
-#  Copyright 2015 Premek Brada <brada@xubuntu1504vbox>
+#  Copyright 2015 Premek Brada <p.brada@gmail.com>
 #  
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by

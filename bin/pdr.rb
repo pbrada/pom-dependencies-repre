@@ -1,6 +1,6 @@
 #  pdr.rb -- driver script for "POM Dependency Representation" tool
 #  
-#  Copyright 2015 Premek Brada <brada@xubuntu1504vbox>
+#  Copyright 2015 Premek Brada <p.brada@gmail.com>
 #  
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -21,5 +21,14 @@
 
 require 'main'
 
-prog = MainClass.new('./test/data/')
+dir = ARGV[0]
+if not dir 
+	puts "Hallo there, would you please provide me with a path to a Maven repo?"
+	exit
+elsif not File.directory?(dir) 
+	puts "Listen, I need a _directory path_ as the argument. #{dir} is something else."
+	exit
+end
+
+prog = MainClass.new(dir)
 prog.run
