@@ -1,0 +1,13 @@
+#,Tracker,Status,Priority,Subject,Estimated time,% Done,Updated,Description
+685,Feature,New,Normal,"add ""optional"" dependency attribute","",0,22.01.2016 23:00,"Some projects use optional dependencies, like below (taken from ch.qos.logback:logback-core:1.1.1).  Should be added to the dependency data and representation.
+
+<pre>
+    <dependency>
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>
+      <scope>compile</scope>
+      <optional>true</optional>
+    </dependency>
+</pre>"
+687,Task,New,Normal,create basic unit tests,"",0,22.01.2016 23:07,core API and functionality of domain objects and analysers needs to be checked by tests.
+686,Feature,New,Normal,replace exception trace output with human messages,"",0,22.01.2016 23:05,Currently the tool spits raw exception traces sometimes. This needs to be replaced by STDERR output that is human readable.

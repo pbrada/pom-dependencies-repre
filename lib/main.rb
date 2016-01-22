@@ -48,7 +48,7 @@ class MainClass
 		puts "... and the result is:"
 		@mvn.artefacts.each do |a| 
 			#puts "#{a}\n   (#{a.inspect})"
-			puts a.get_representation
+			puts a.get_representation "txt", true
 		end
 
 	end
